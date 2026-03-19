@@ -8,7 +8,7 @@
 int main(void)
 {
     double capital, taxa, tempo;
-    int flags = 0; // tudo desligado
+    int flags = 0; // estado inicial: absolutamente nada confiável
 
     printf("Digite o capital: ");
     if (scanf("%lf", &capital) == 1)
@@ -22,7 +22,10 @@ int main(void)
     if (scanf("%lf", &tempo) == 1)
         flags |= TEMPO_OK;
 
-    // verifica se TODOS os dados foram lidos
+    // sim, isso poderia ser feito sem bitmask e com menos firula.
+    // mas a ideia aqui é controlar estado de forma explícita e barata.
+    // além disso, confiar cegamente em scanf é pedir pra depurar bug fantasma depois.
+
     if ((flags & (CAPITAL_OK | TAXA_OK | TEMPO_OK)) != 
         (CAPITAL_OK | TAXA_OK | TEMPO_OK))
     {
@@ -31,6 +34,9 @@ int main(void)
     }
 
     taxa /= 100.0;
+
+    // pow não é a coisa mais barata do mundo, mas também não é onde seu programa vai morrer.
+    // se isso aqui fosse gargalo, o problema já teria começado bem antes.
 
     double montante = capital * pow(1 + taxa, tempo);
     double juros = montante - capital;
